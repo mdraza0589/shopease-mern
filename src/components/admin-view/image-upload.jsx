@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import axios from "axios";
+import axios from '../../api/axios'
 
 const ProductImageUpload = ({
     imageFile,
@@ -21,15 +21,19 @@ const ProductImageUpload = ({
     const uploadImageToCloudinary = async () => {
         try {
             setIsImageLoading(true);
+
             const data = new FormData();
             data.append("my_file", imageFile);
 
-            const response = await axios.post(
-                "http://localhost:5000/api/admin/products/upload-image",
-                data
-            );
+            // 🔥 Uses baseURL from axios config instead of localhost
+            const response = await axios.post(`/api/admin/products/upload-image`, data, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
 
             console.log("Upload response:", response.data);
+
             const imageUrl =
                 response?.data?.url ||
                 response?.data?.imageUrl ||
