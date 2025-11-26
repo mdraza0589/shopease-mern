@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const BASE_URL = "https://shopease-backend-orpin.vercel.app/api/admin/orders";
+const BASE_URL = "http://localhost:5000/api/admin/orders";
 
 // ✅ FIXED: Correct async signature
 export const GetAllOrdersForAdmin = createAsyncThunk(

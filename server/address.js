@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API_URL = "https://shopease-backend-orpin.vercel.app/api/shop/address";
+const API_URL = "http://localhost:5000/api/shop/address";
 
 // ✅ 1️⃣ Add New Address
 export const addNewAddress = createAsyncThunk(

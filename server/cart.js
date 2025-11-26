@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-let BASE_URL = "https://shopease-backend-orpin.vercel.app/api/shop/cart";
+let BASE_URL = "http://localhost:5000/api/shop/cart";
 
 
 export const addToCart = createAsyncThunk(

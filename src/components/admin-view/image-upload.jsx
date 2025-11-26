@@ -25,7 +25,7 @@ const ProductImageUpload = ({
             data.append("my_file", imageFile);
 
             const response = await axios.post(
-                "https://shopease-backend-orpin.vercel.app/api/admin/products/upload-image",
+                "http://localhost:5000/api/admin/products/upload-image",
                 data
             );
 
