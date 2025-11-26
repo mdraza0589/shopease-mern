@@ -23,7 +23,7 @@ const CheckAuth = ({ isAuthenticated, user, children }) => {
 
     // ✅ Allow access to WelcomePage once after login
     if (isAuthenticated && location.pathname.includes('/shop/home')) {
-        return children;
+        return <Navigate to="/shop/home" />;
     }
 
     if (isAuthenticated && location.pathname === '/welcomePage') {
