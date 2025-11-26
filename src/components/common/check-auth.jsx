@@ -4,7 +4,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 const CheckAuth = ({ isAuthenticated, user, children }) => {
     const location = useLocation();
 
-    // If not authenticated and not on login/register → send to login
+    // 1️⃣ BLOCK UNAUTHENTICATED USERS (unless login/register)
     if (
         !isAuthenticated &&
         !(location.pathname.includes('/login') || location.pathname.includes('/register'))
@@ -12,37 +12,22 @@ const CheckAuth = ({ isAuthenticated, user, children }) => {
         return <Navigate to="/auth/login" />;
     }
 
-    // If authenticated and currently on login/register → redirect to correct dashboard
+    // 2️⃣ REDIRECT AUTH USERS FROM LOGIN/REGISTER
     if (isAuthenticated && (location.pathname.includes('/login') || location.pathname.includes('/register'))) {
-        if (user?.role === 'admin') {
-            return <Navigate to="/admin/dashboard" />;
-        } else {
-            return <Navigate to="/shop/home" />;
-        }
+        return <Navigate to={user?.role === 'admin' ? '/admin/dashboard' : '/shop/home'} />;
     }
 
-    // ✅ Allow access to WelcomePage once after login
-    if (isAuthenticated && location.pathname.includes('/shop/home')) {
-        return <Navigate to="/shop/home" />;
-    }
-
-    if (isAuthenticated && location.pathname === '/welcomePage') {
-        return children;
-    }
-
-    // Prevent unauthorized role access
-    if (isAuthenticated && user?.role !== 'admin' && location.pathname.includes('/admin')) {
+    // 3️⃣ PREVENT WRONG ROLE ACCESS
+    if (isAuthenticated && user?.role !== 'admin' && location.pathname.startsWith('/admin')) {
         return <Navigate to="/unauth-page" />;
     }
 
-    if (isAuthenticated && user?.role === 'admin' && location.pathname.includes('/shop')) {
+    if (isAuthenticated && user?.role === 'admin' && location.pathname.startsWith('/shop')) {
         return <Navigate to="/admin/dashboard" />;
     }
 
+    // Allow the requested page
     return children;
 };
 
 export default CheckAuth;
-
-
-
