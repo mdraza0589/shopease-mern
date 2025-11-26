@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000/api/shop/review";
+const BASE_URL = "https://shopease-backend-orpin.vercel.app/api/shop/review";
 
 /* 📝 Add a new product review */
 export const addProductReview = createAsyncThunk(

@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000/api/shop/order";
+const BASE_URL = "https://shopease-backend-orpin.vercel.app/api/shop/order";
 
 // 🧾 Create Razorpay Order
 export const createNewOrder = createAsyncThunk(
@@ -62,4 +62,3 @@ export const fetchOrderDetails = createAsyncThunk(
 
 
 
- 

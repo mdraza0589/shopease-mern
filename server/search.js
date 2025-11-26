@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000/api/shop/search";
+const BASE_URL = "https://shopease-backend-orpin.vercel.app/api/shop/search";
 
 // 🔍 Search products by keyword
 export const searchProducts = createAsyncThunk(

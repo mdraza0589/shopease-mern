@@ -7,7 +7,7 @@ export const addNewProduct = createAsyncThunk(
     async (formData, { rejectWithValue }) => {
         try {
             const response = await axios.post(
-                "http://localhost:5000/api/admin/products/add",
+                "https://shopease-backend-orpin.vercel.app/api/admin/products/add",
                 formData,
                 { headers: { "Content-Type": "application/json" } }
             );
@@ -24,7 +24,7 @@ export const fetchProduct = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const response = await axios.get(
-                "http://localhost:5000/api/admin/products/get"
+                "https://shopease-backend-orpin.vercel.app/api/admin/products/get"
             );
 
             return response.data;
@@ -47,7 +47,7 @@ export const fetchFilteredProduct = createAsyncThunk(
             });
 
             const response = await axios.get(
-                `http://localhost:5000/api/shop/products/get?${query}`
+                `https://shopease-backend-orpin.vercel.app/api/shop/products/get?${query}`
             );
             return response.data;
         } catch (error) {
@@ -64,7 +64,7 @@ export const fetchProductDetails = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             const response = await axios.get(
-                `http://localhost:5000/api/shop/products/get/${id}`
+                `https://shopease-backend-orpin.vercel.app/api/shop/products/get/${id}`
             );
             // return only the useful data for the reducer
             return response.data.data;
@@ -83,7 +83,7 @@ export const editProduct = createAsyncThunk(
     async ({ id, formData }, { rejectWithValue }) => {
         try {
             const response = await axios.put(
-                `http://localhost:5000/api/admin/products/edit/${id}`,
+                `https://shopease-backend-orpin.vercel.app/api/admin/products/edit/${id}`,
                 formData,
                 {
                     headers: {
@@ -107,7 +107,7 @@ export const deleteProduct = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             const response = await axios.delete(
-                `http://localhost:5000/api/admin/products/delete/${id}`
+                `https://shopease-backend-orpin.vercel.app/api/admin/products/delete/${id}`
             );
 
             return response.data;
