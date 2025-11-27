@@ -42,7 +42,7 @@ const CheckOutPage = () => {
                 const verifyResult = await dispatch(verifyPayment(paymentData));
                 verifyResult?.payload?.success
                     ? alert('✅ Payment Successful!')
-                    
+
                     : alert('❌ Payment verification failed!');
             },
             prefill: {
@@ -80,20 +80,26 @@ const CheckOutPage = () => {
         }
 
         const orderData = {
-            userId: user?.id,
-            cartId: cartItems?._id,
+            userId: user?._id || user?.id,
+            cartId: cartItems?._id || cartItems?.cartId,
             cartItems: cartItems.items,
             addressInfo: currentSelectedAddress,
-            totalAmount: totalCartAmount,
+            totalAmount: Number(totalCartAmount.toFixed(2)),
             orderStatus: 'Pending',
             paymentMethod: 'Razorpay',
             paymentStatus: 'Pending',
             orderDate: new Date(),
         };
 
+
         const result = await dispatch(createNewOrder(orderData));
-        if (result?.payload?.success) initiateRazorpayPayment(result.payload);
-        else toast.warn('Error creating order.');
+        if (result?.payload?.success) {
+            initiateRazorpayPayment(result.payload);
+        } else {
+            console.log("Order API Error:", result.payload);
+            toast.error(result?.payload?.message || "Error creating order");
+        }
+
 
     };
 
