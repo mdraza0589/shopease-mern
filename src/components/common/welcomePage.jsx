@@ -6,7 +6,7 @@ const WelcomePage = ({ isAuthenticated, user }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [redirect, setRedirect] = useState(false);
     const navigate = useNavigate();
-    const fullText = "WELCOME TO SHOPEAS";
+    const fullText = "WELCOME TO SHOPEASE";
     const typingSpeed = 100; // milliseconds per character
 
     // Typing animation effect

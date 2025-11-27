@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import AliceCarousel from "react-alice-carousel";
 import "react-alice-carousel/lib/alice-carousel.css";
-import { GiLoincloth } from "react-icons/gi";
-import { TbBrandAnsible } from "react-icons/tb";
-import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { FiUser, FiUserCheck, FiSmile, FiShoppingBag, FiWatch } from "react-icons/fi";
+import { RiRemixiconFill } from "react-icons/ri";
+import { RiContrastFill } from "react-icons/ri";
+import { FaTshirt } from "react-icons/fa";
+import { RiContrast2Fill } from "react-icons/ri";
+import { RiContrastDrop2Fill } from "react-icons/ri";
+import { FaFonticonsFi } from "react-icons/fa6";
+import { RiContrastDropLine } from "react-icons/ri";
+import { RiContractLeftRightFill } from "react-icons/ri";
+import { FaIcons } from "react-icons/fa";
 
 import {
   fetchFilteredProduct,
@@ -18,7 +26,7 @@ import ShoppingProductTile from "../../components/shopping-view/product-tile";
 import Loading from "../../components/Loding/Loading";
 import ProductDetailsDialog from "../../components/shopping-view/product-details";
 
-/* ---------------------------- Hero Images ---------------------------- */
+/* ---------------------------- Constants ---------------------------- */
 const imageUrls = [
   "https://cdn.pixabay.com/photo/2017/01/14/10/03/fashion-1979136_1280.jpg",
   "https://cdn.pixabay.com/photo/2015/06/10/13/23/clothesline-804812_1280.jpg",
@@ -50,29 +58,30 @@ const slideTexts = [
   },
 ];
 
-/* ---------------------------- Brand + Category ---------------------------- */
 const brandList = [
-  { id: "nike", label: "nike", icon: <TbBrandAnsible size={30} /> },
-  { id: "adidas", label: "adidas", icon: <TbBrandAnsible size={30} /> },
-  { id: "puma", label: "puma", icon: <TbBrandAnsible size={30} /> },
-  { id: "levis", label: "levis", icon: <TbBrandAnsible size={30} /> },
-  { id: "woodland", label: "woodland", icon: <TbBrandAnsible size={30} /> },
-  { id: "hm", label: "hm", icon: <TbBrandAnsible size={30} /> },
-  { id: "mufti", label: "mufti", icon: <TbBrandAnsible size={30} /> },
-  { id: "zara", label: "zara", icon: <TbBrandAnsible size={30} /> },
+  { id: "nike", label: "Nike", icon: <RiRemixiconFill size={30} /> },
+  { id: "adidas", label: "Adidas", icon: <RiContrastFill size={30} /> },
+  { id: "puma", label: "Puma", icon: <RiContrast2Fill size={30} /> },
+  { id: "levis", label: "Levi's", icon: <RiContrastDrop2Fill size={30} /> },
+  { id: "woodland", label: "Woodland", icon: <FaFonticonsFi size={30} /> },
+  { id: "hm", label: "H&M", icon: <RiContrastDropLine size={30} /> },
+  { id: "mufti", label: "Mufti", icon: <RiContractLeftRightFill size={30} /> },
+  { id: "zara", label: "Zara", icon: <FaIcons size={30} /> },
 ];
 
+
 const categoryItemsList = [
-  { id: "men", label: "Men", icon: <GiLoincloth size={30} /> },
-  { id: "women", label: "Women", icon: <GiLoincloth size={30} /> },
-  { id: "kids", label: "Kids", icon: <GiLoincloth size={30} /> },
-  { id: "footwear", label: "Footwear", icon: <GiLoincloth size={30} /> },
-  { id: "accessories", label: "Accessories", icon: <GiLoincloth size={30} /> },
+  { id: "men", label: "Men", icon: <FiUser size={30} /> },
+  { id: "women", label: "Women", icon: <FiUserCheck size={30} /> },
+  { id: "kids", label: "Kids", icon: <FiSmile size={30} /> },
+  { id: "footwear", label: "Footwear", icon: <FiShoppingBag size={30} /> },
+  { id: "accessories", label: "Accessories", icon: <FiWatch size={30} /> },
 ];
 
 const ShoppingHome = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -83,7 +92,7 @@ const ShoppingHome = () => {
   const { user } = useSelector((state) => state.auth);
 
   /* ---------------------------- 🛒 Add to Cart ---------------------------- */
-  const handleAddToCart = (getId) => {
+  const handleAddToCart = async (productId) => {
     if (!user?.id) {
       toast.warn("⚠️ Please log in to add items to cart!", {
         position: "top-right",
@@ -92,67 +101,104 @@ const ShoppingHome = () => {
       return;
     }
 
-    dispatch(
-      addToCart({
-        userId: user.id,
-        productId: getId,
-        quantity: 1,
-      })
-    )
-      .then((data) => {
-        if (data?.payload?.success) {
-          dispatch(fetchCartItems(user.id));
-          toast.success("🛍️ Product added to cart!", {
-            position: "top-right",
-            autoClose: 1000,
-          });
-        } else {
-          toast.error("❌ Failed to add item!", {
-            position: "top-right",
-            autoClose: 1000,
-          });
-        }
-      })
-      .catch(() => {
-        toast.error("❌ Something went wrong!", {
+    try {
+      const result = await dispatch(
+        addToCart({
+          userId: user.id,
+          productId: productId,
+          quantity: 1,
+        })
+      ).unwrap();
+
+      if (result?.success) {
+        dispatch(fetchCartItems(user.id));
+        toast.success("🛍️ Product added to cart!", {
           position: "top-right",
-          autoClose: 2000,
+          autoClose: 1000,
         });
+      } else {
+        toast.error("❌ Failed to add item to cart!", {
+          position: "top-right",
+          autoClose: 1000,
+        });
+      }
+    } catch (error) {
+      console.error("Add to cart error:", error);
+      toast.error("❌ Something went wrong!", {
+        position: "top-right",
+        autoClose: 2000,
       });
+    }
   };
 
   /* ---------------------------- 🔍 Product Details ---------------------------- */
-  const handleGetProductDetails = (itemId) => {
-    dispatch(fetchProductDetails(itemId))
-      .unwrap()
-      .then(() => setOpenDetailsDialog(true))
-      .catch((err) => console.error("Error fetching product details:", err));
+  const handleGetProductDetails = async (itemId) => {
+    try {
+      await dispatch(fetchProductDetails(itemId)).unwrap();
+      setOpenDetailsDialog(true);
+    } catch (error) {
+      console.error("Error fetching product details:", error);
+      toast.error("❌ Failed to load product details!", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+    }
   };
 
   const handleCloseDialog = () => setOpenDetailsDialog(false);
 
   /* ---------------------------- Fetch featured products ---------------------------- */
   useEffect(() => {
-    dispatch(fetchFilteredProduct({ filterParams: {}, sortParams: "latest" }));
+    const loadFeaturedProducts = async () => {
+      try {
+        await dispatch(fetchFilteredProduct({
+          filterParams: {},
+          sortParams: "latest"
+        })).unwrap();
+      } catch (error) {
+        console.error("Error fetching featured products:", error);
+        toast.error("❌ Failed to load featured products!", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      }
+    };
+
+    loadFeaturedProducts();
   }, [dispatch]);
 
+  // Update featured products when productList changes
+  useEffect(() => {
+    if (productList && Array.isArray(productList)) {
+      setFeaturedProducts(productList.slice(0, 12));
+    }
+  }, [productList]);
+
+  /* ---------------------------- Navigation Handlers ---------------------------- */
   const handleCategoryNavigate = (getCurrentItem, section) => {
-    sessionStorage.removeItem("filters");
-    const currentFilter = { [section]: [getCurrentItem.id] };
-    sessionStorage.setItem("filters", JSON.stringify(currentFilter));
-    navigate("/shop/listing");
+    try {
+      sessionStorage.removeItem("filters");
+      const currentFilter = { [section]: [getCurrentItem.id] };
+      sessionStorage.setItem("filters", JSON.stringify(currentFilter));
+      navigate("/shop/listing");
+    } catch (error) {
+      console.error("Navigation error:", error);
+    }
   };
 
-  const handleSlideChanged = (e) => setActiveIndex(e.item);
+  const handleSlideChanged = (e) => {
+    setActiveIndex(e.item);
+  };
 
   /* ---------------------------- Hero Carousel ---------------------------- */
-  const items = imageUrls.map((url, index) => (
+  const carouselItems = imageUrls.map((url, index) => (
     <div className="relative w-full h-[70vh] md:h-[90vh]" key={index}>
       <img
         src={url}
         alt={`Slide ${index + 1}`}
         className="w-full h-full object-cover"
         draggable="false"
+        loading="lazy"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent flex items-center justify-center">
         <div
@@ -162,14 +208,14 @@ const ShoppingHome = () => {
             }`}
         >
           <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold mb-4 drop-shadow-lg">
-            {slideTexts[index].title}
+            {slideTexts[index]?.title || "Fashion Collection"}
           </h2>
           <p className="text-lg md:text-2xl font-light mb-6 drop-shadow-md">
-            {slideTexts[index].description}
+            {slideTexts[index]?.description || "Discover amazing products"}
           </p>
           <button
             onClick={() => navigate("/shop/listing")}
-            className="bg-amber-500 cursor-pointer hover:bg-amber-400 text-white font-semibold px-6 py-3 rounded-full transition duration-300 shadow-lg"
+            className="bg-amber-500 cursor-pointer hover:bg-amber-400 text-white font-semibold px-6 py-3 rounded-full transition duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
             Explore Products
           </button>
@@ -180,81 +226,85 @@ const ShoppingHome = () => {
 
   /* ---------------------------- JSX ---------------------------- */
   return (
-    <div className="w-full bg-gray-50">
+    <div className="w-full bg-gray-50 min-h-screen">
       <ToastContainer />
 
       {/* 🌄 Hero Section */}
-      <AliceCarousel
-        autoPlay
-        infinite
-        autoPlayInterval={2500}
-        animationDuration={1200}
-        animationType="fadeout"
-        disableDotsControls
-        disableButtonsControls
-        mouseTracking={false}
-        touchTracking={false}
-        autoPlayStrategy="default"
-        items={items}
-        onSlideChanged={handleSlideChanged}
-      />
+      <section className="relative">
+        <AliceCarousel
+          autoPlay
+          infinite
+          autoPlayInterval={2500}
+          animationDuration={1200}
+          animationType="fadeout"
+          disableDotsControls
+          disableButtonsControls
+          mouseTracking={false}
+          touchTracking={false}
+          autoPlayStrategy="default"
+          items={carouselItems}
+          onSlideChanged={handleSlideChanged}
+        />
+      </section>
 
       {/* 🛍️ Category Section */}
-      <div className="max-w-6xl mx-auto mt-12 mb-16 px-4">
+      <section className="max-w-6xl mx-auto mt-12 mb-16 px-4">
         <h1 className="text-3xl text-center font-bold mb-8 text-gray-800">
           Shop by Category
         </h1>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 justify-items-center">
           {categoryItemsList.map((item, index) => (
-            <div
+            <button
               onClick={() => handleCategoryNavigate(item, "category")}
-              key={index}
-              className="flex flex-col items-center justify-center bg-white rounded-2xl shadow-md p-5 cursor-pointer hover:scale-105 hover:shadow-lg transition-all duration-300"
+              key={item.id}
+              className="flex flex-col items-center justify-center bg-white rounded-2xl shadow-md p-5 cursor-pointer hover:scale-105 hover:shadow-lg transition-all duration-300 w-full border border-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50"
             >
               <div className="text-amber-500 mb-3">{item.icon}</div>
               <p className="text-gray-800 font-semibold text-lg capitalize">
                 {item.label}
               </p>
-            </div>
+            </button>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* 🏷️ Brand Section */}
-      <div className="max-w-6xl mx-auto mt-12 mb-16 px-4">
+      <section className="max-w-6xl mx-auto mt-12 mb-16 px-4">
         <h1 className="text-3xl text-center font-bold mb-8 text-gray-800">
           Shop by Brand
         </h1>
 
-        <div className="flex flex-wrap justify-between gap-6">
-          {brandList.map((item, index) => (
-            <div
+        <div className="flex flex-wrap justify-center gap-6">
+          {brandList.map((item) => (
+            <button
               onClick={() => handleCategoryNavigate(item, "brand")}
-              key={index}
-              className="flex flex-col items-center justify-center bg-white rounded-2xl shadow-md p-4 w-[100px] hover:scale-105 hover:shadow-lg transition-all duration-300 cursor-pointer"
+              key={item.id}
+              className="flex flex-col items-center justify-center bg-white rounded-2xl shadow-md p-4 w-[100px] hover:scale-105 hover:shadow-lg transition-all duration-300 cursor-pointer border border-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50"
             >
               <div className="text-amber-500 mb-2">{item.icon}</div>
               <p className="text-gray-800 font-semibold text-sm text-center capitalize">
                 {item.label}
               </p>
-            </div>
+            </button>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* ⭐ Featured Products */}
-      <div className="max-w-6xl mx-auto px-4 pb-16">
+      {/* ⭐ Featured Products Section */}
+      <section className="max-w-6xl mx-auto px-4 pb-16">
         <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center">
           Featured Products
         </h2>
 
         {isLoading ? (
-          <Loading />
+          <div className="flex justify-center items-center py-12">
+            <Loading />
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {productList && productList.length > 0 ? (
-              productList.slice(0, 12).map((item) => (
+            {featuredProducts.length > 0 ? (
+              featuredProducts.map((item) => (
                 <ShoppingProductTile
                   key={item._id || item.id}
                   product={item}
@@ -263,26 +313,38 @@ const ShoppingHome = () => {
                 />
               ))
             ) : (
-              <p className="text-center text-gray-500 w-full col-span-full">
-                No products available
-              </p>
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-500 text-lg">No featured products available</p>
+                <button
+                  onClick={() => navigate("/shop/listing")}
+                  className="mt-4 bg-amber-500 hover:bg-amber-400 text-white font-semibold px-6 py-2 rounded-full transition duration-300"
+                >
+                  Browse All Products
+                </button>
+              </div>
             )}
           </div>
         )}
 
-
-        <div className="flex justify-center mt-10">
-          <button
-            onClick={() => navigate("/shop/listing")}
-            className="bg-amber-500 cursor-pointer hover:bg-amber-400 text-white font-semibold px-8 py-3 rounded-full transition duration-300 shadow-md"
-          >
-            View All Products
-          </button>
-        </div>
-      </div>
+        {featuredProducts.length > 0 && (
+          <div className="flex justify-center mt-10">
+            <button
+              onClick={() => navigate("/shop/listing")}
+              className="bg-amber-500 cursor-pointer hover:bg-amber-400 text-white font-semibold px-8 py-3 rounded-full transition duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+            >
+              View All Products
+            </button>
+          </div>
+        )}
+      </section>
 
       {/* 🧩 Product Details Dialog */}
-      {openDetailsDialog && <ProductDetailsDialog onClose={handleCloseDialog} />}
+      {openDetailsDialog && (
+        <ProductDetailsDialog
+          onClose={handleCloseDialog}
+          productDetails={productDetails}
+        />
+      )}
     </div>
   );
 };
